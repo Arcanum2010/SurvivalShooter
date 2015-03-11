@@ -9,6 +9,7 @@ public class PlayerController : MonoBehaviour {
 	Animator anim;
 	Rigidbody playerRb;
 	int floorMask;
+	float camRayLength = 100f;
 
 	// Use this for initialization
 	void Awake () {
@@ -29,7 +30,23 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	void Rotation () {
+		Ray camRay = Camera.main.ScreenPointToRay (Input.mousePosition);
+		RaycastHit floorHit;
 		
+		if(Physics.Raycast (camRay, out floorHit, camRayLength, floorMask))
+        {
+            // Create a vector from the player to the point on the floor the raycast from the mouse hit.
+            Vector3 playerToMouse = floorHit.point - transform.position;
 
+            // Ensure the vector is entirely along the floor plane.
+            playerToMouse.y = 0f;
+
+            // Create a quaternion (rotation) based on looking down the vector from the player to the mouse.
+            Quaternion newRotation = Quaternion.LookRotation (playerToMouse);
+
+            // Set the player's rotation to this new rotation.
+            playerRigidbody.MoveRotation (newRotation);
+        }
+		
 	}
 }
